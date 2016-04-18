@@ -10,11 +10,10 @@ class Init
     print_usage
     puts "\nOPTIONS:"
     puts "  init          : Initialize environment.rb file"
-    puts "  dir           : Add all .rb files in current directory to environment"
-    puts "  file [file]   : Add file to environment "
+    puts "  file [dir]    : Add all .rb files in directory to environment"
+    puts "  file [file]   : Add file to environment, e.g. 'test1.rb' "
     puts "  gem [gem]     : Add gem to environment using exact name"
     puts "  gem -s [gem]  : Search partial gem name and add gem to environment"
-    puts "  gem .         : Add gem shortcut $: << '.' to file"
     puts "  help          : Display this message \n"
   end
 
@@ -70,5 +69,3 @@ class Init
     puts "  Added file header"
   end
 end
-
-Init.init

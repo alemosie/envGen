@@ -1,5 +1,6 @@
 require 'pathname'
 require 'pry'
+require 'find'
 
 class Files
 
@@ -18,30 +19,14 @@ class Files
     end
   end
 
-  def exists? # looks through environment for fileName
-    File.readlines("config/environment.rb").grep(/#{self.fileName}/).size > 0
-  end
-
-  def isRuby?
-    File.extname(fileName) == ".rb"
-  end
-
-  def notRuby # handle non-Ruby files
-    puts "'#{fileName}' is not a Ruby (.rb) file. Continue? (Y/N)"
-    answer = gets.chomp.strip
-    if answer == "Y"
-      write
-    end
-  end
-
-  def write # add relative path of file to environment
+  def write # adds relative path of file to environment
     File.open("config/environment.rb", "a") {|env|
       env.puts "require_relative '#{self.relativePath(file)}'"
     }
     puts "Added '#{self.file}'"
   end
 
-  def add
+  def add # handles writing files
     new_file = self.create
     if new_file && File.file?(new_file.file)
       if new_file.isRuby?
@@ -52,46 +37,84 @@ class Files
     end
   end
 
-  def relativePath(file)
-    dir = Pathname.new "/Users/asiega/Development/immersive/personal-projects/envGen/config/environment.rb"
+  def exists? # looks through environment for fileName
+    File.readlines("config/environment.rb").grep(/#{self.fileName}/).size > 0
+  end
+
+  def isRuby?
+    File.extname(fileName) == ".rb"
+  end
+
+  def notRuby # handles non-Ruby files
+    puts "'#{fileName}' is not a Ruby (.rb) file. Continue? (Y/N)"
+    answer = gets.chomp.strip
+    if answer == "Y"
+      write
+    end
+  end
+
+  def relativePath(file) # finds file path relative to environment
+    dir = Pathname.new File.absolute_path('config/environment.rb')
     filePathname = Pathname.new file
     relative = (filePathname.relative_path_from dir).to_s
     results = relative.split("/").uniq.join("/")
-    # binding.pry
   end
 end
 
 class AddFiles
 
   def self.absolutePath(file)
-    if File.file?(file)
+    exists = self.findRuby(Dir.pwd)
+    if exists
       if File.absolute_path(file) == file
         file
       else
         File.absolute_path(file)
       end
+    else
+      "No file found"
     end
   end
 
-  def self.single(file)
+  def self.single(file) # add a single file
     fullFile = self.absolutePath(file)
-    new_file = Files.new(fullFile)
-    new_file.add
+    if fullFile
+      new_file = Files.new(fullFile)
+      new_file.add
+    end
   end
 
-  def self.dir
+  # def self.convert(path)
+  #   if path == "."
+  #     Dir.pwd
+  #   elsif path == ".."
+  #     dir = Dir.pwd.split("/")
+  #     top = dir.pop
+  #     dir.join("/")
+  #   end
+  # end
 
-    Dir.entries(".").select do |file|
-      # binding.pry
-      if file[0] != "."
-        findRuby(file)
-      # elsif findDirectory(Dir.pwd)
-      #   self.dir
-      #   @@files
+  def self.findRuby(dir) # find all of the Ruby files in the current dir/sub dirs
+    rubyFiles = []
+
+    Find.find(dir) do |path|
+      if File.extname(path) == ".rb" # look for Ruby!
+        rubyFiles << path # and compile a list
       end
     end
-    @@files
+    rubyFiles
+  end
+
+  def self.dir(dir) # takes in dir name, adds all Ruby files in dir
+    files = self.findRuby(dir)
+    files.each do |file|
+      if file.include?(".rb") && File.file?(file)
+        self.single(file)
+      end
+    end
   end
 end
 
-puts AddFiles.single("lib/test1.txt")
+# puts AddFiles.absolutePath('test1.rb')
+
+AddFiles.dir("config")

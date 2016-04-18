@@ -13,6 +13,7 @@ class Gems
 
     @@gems.each do |gemString|
       if exactGem?(gemString, gem)
+        self.write(gem)
         puts "Added '#{gem}' to config/environment.rb"
         gemFound = gem
       end
@@ -45,4 +46,9 @@ class Gems
     end
   end
 
+  def self.write(gem) # need to figure out how to write in the middle of a file
+    File.open("config/environment.rb", "a+") {|env|
+      env.puts "gem '#{gem}'"
+    }
+  end
 end
