@@ -11,34 +11,23 @@ class Files
     @fileName = File.basename(file)
   end
 
-  def create # creates a files object if not exists
-    if !self.exists?
-      new_file = Files.new(file)
+  def self.createIfNotInConfig(file) # creates a files object if not exists
+    if !inConfig?(file)
+      Files.new(file)
     else
-      puts "File already added to environment.rb"
+      puts "'#{File.basename(file)}' already added to environment.rb"
     end
+  end
+
+  def self.inConfig?(file) # looks through environment for fileName
+    File.readlines("config/environment.rb").grep(/#{File.basename(file)}/).size > 0
   end
 
   def write # adds relative path of file to environment
     File.open("config/environment.rb", "a") {|env|
       env.puts "require_relative '#{self.relativePath(file)}'"
     }
-    puts "Added '#{self.file}'"
-  end
-
-  def add # handles writing files
-    new_file = self.create
-    if new_file && File.file?(new_file.file)
-      if new_file.isRuby?
-        new_file.write
-      else
-        new_file.notRuby
-      end
-    end
-  end
-
-  def exists? # looks through environment for fileName
-    File.readlines("config/environment.rb").grep(/#{self.fileName}/).size > 0
+    puts "Added '#{self.fileName}'"
   end
 
   def isRuby?
@@ -55,7 +44,7 @@ class Files
 
   def relativePath(file) # finds file path relative to environment
     dir = Pathname.new File.absolute_path('config/environment.rb')
-    filePathname = Pathname.new file
+    filePathname = Pathname.new File.absolute_path(file)
     relative = (filePathname.relative_path_from dir).to_s
     results = relative.split("/").uniq.join("/")
   end
@@ -63,24 +52,18 @@ end
 
 class AddFiles
 
-  def self.absolutePath(file)
-    exists = self.findRuby(Dir.pwd)
-    if exists
-      if File.absolute_path(file) == file
-        file
+  def self.single(file) # handles writing files
+    new_file = Files.createIfNotInConfig(file)
+    if new_file # if not nil
+      if File.file?(new_file.file) # check if file
+        if new_file.isRuby?
+          new_file.write
+        else
+          new_file.notRuby
+        end
       else
-        File.absolute_path(file)
+        "File not found"
       end
-    else
-      "No file found"
-    end
-  end
-
-  def self.single(file) # add a single file
-    fullFile = self.absolutePath(file)
-    if fullFile
-      new_file = Files.new(fullFile)
-      new_file.add
     end
   end
 
@@ -117,4 +100,4 @@ end
 
 # puts AddFiles.absolutePath('test1.rb')
 
-AddFiles.dir("config")
+AddFiles.dir("lib")
