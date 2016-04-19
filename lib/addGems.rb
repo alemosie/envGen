@@ -52,3 +52,5 @@ class Gems
     }
   end
 end
+
+Gems.gem("activerecord")

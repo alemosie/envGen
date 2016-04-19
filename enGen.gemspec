@@ -1,11 +1,11 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'envGen/version'
+require 'enGen/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "envGen"
-  spec.version       = EnvGen::VERSION
+  spec.name          = "enGen"
+  spec.version       = EnGen::VERSION
   spec.authors       = ["alemosie"]
   spec.email         = ["alexandra.siega@gmail.com"]
 

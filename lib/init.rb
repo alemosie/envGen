@@ -3,7 +3,7 @@ class Init
   attr_accessor :config
 
   def self.print_usage
-    puts "\nUSAGE:\n  envGen [option]"
+    puts "\nUSAGE:\n  enGen [option]"
   end
 
   def self.help
@@ -12,6 +12,7 @@ class Init
     puts "  init          : Initialize environment.rb file"
     puts "  file [dir]    : Add all .rb files in directory to environment"
     puts "  file [file]   : Add file to environment, e.g. 'test1.rb' "
+    puts "  dir [dir]     : Add Dir[dir/*.rb] bulk file getter to environment"
     puts "  gem [gem]     : Add gem to environment using exact name"
     puts "  gem -s [gem]  : Search partial gem name and add gem to environment"
     puts "  help          : Display this message \n"
@@ -24,6 +25,7 @@ class Init
     puts "\nChecking for 'config/environment.rb' file:"
     self.environment
     self.headers
+    `atom config/environment.rb`
   end
 
 
@@ -51,21 +53,37 @@ class Init
 
   def self.headers
     File.open("config/environment.rb", "w+") {|file|
-      file.puts "# GEM DEPENDENCIES (require [gem] or $: <<  '.')"
-      file.puts "\n\n"
-      file.puts "# GEM SHORTCUT - when combined with bundler, no need to add gems"
+      file.puts "# ADD CURRENT DIR TO LOAD PATH"
       file.puts "$: << '.'"
       file.puts "\n\n"
       file.puts "# AUTO INSTALL GEMS VIA BUNDLER"
       file.puts "require 'bundler'"
-      file.puts "Bundler.require"
+      file.puts "Bundler.require" # require 'bundler/setup', Bundler.require?
       file.puts "\n\n"
-      file.puts "# FILE DEPENDENCIES (require_relative [file])"
+      file.puts "# DATABASE"
+      file.puts "DB = {:conn => SQLite3::Database.new('DATABASE')}"
+      file.puts "DB.results_as_hash = true"
+      file.puts "\n\n"
+      file.puts "# ACTIVERECORD"
+      file.puts "ActiveRecord::Base.establish_connection(
+                :adapter => 'sqlite3',
+                :database => 'DATABASE.sqlite'
+                )"
+      file.puts "\n\n"
+      file.puts "# GEM DEPENDENCIES (require [gem])"
+      file.puts "\n\n"
+      file.puts "# FILE DEPENDENCIES (require [file])"
+      file.puts "\n\n"
+      file.puts "#! ACTION: Dependencies to sort"
     }
     puts "\nWriting 'environment.rb' file:"
-    puts "  Added gem header"
-    puts "  Added gem shortcut"
+    puts "  Added current directory to load path"
     puts "  Added bundler"
+    puts "  Added database syntax"
+    puts "  Added gem header"
     puts "  Added file header"
+    puts "  Added to-sort header"
   end
 end
+
+Init.init

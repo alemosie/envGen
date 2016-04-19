@@ -25,7 +25,7 @@ class Files
 
   def write # adds relative path of file to environment
     File.open("config/environment.rb", "a") {|env|
-      env.puts "require_relative '#{self.relativePath(file)}'"
+      env.puts "require '#{self.relativePath(file)}'"
     }
     puts "Added '#{self.fileName}'"
   end
@@ -43,7 +43,7 @@ class Files
   end
 
   def relativePath(file) # finds file path relative to environment
-    dir = Pathname.new File.absolute_path('config/environment.rb')
+    dir = Pathname.new Dir.pwd
     filePathname = Pathname.new File.absolute_path(file)
     relative = (filePathname.relative_path_from dir).to_s
     results = relative.split("/").uniq.join("/")
@@ -88,7 +88,7 @@ class AddFiles
     rubyFiles
   end
 
-  def self.dir(dir) # takes in dir name, adds all Ruby files in dir
+  def self.multiple(dir) # takes in dir name, adds all Ruby files in dir
     files = self.findRuby(dir)
     files.each do |file|
       if file.include?(".rb") && File.file?(file)
@@ -96,8 +96,16 @@ class AddFiles
       end
     end
   end
+
+  def self.dir(dir)
+    File.open("config/environment.rb", "a") {|env|
+      env.puts "Dir['#{dir}/*.rb'].each {|f| require f}"
+    }
+    puts "Added 'Dir['#{dir}/*.rb']'"
+  end
+
 end
 
 # puts AddFiles.absolutePath('test1.rb')
 
-AddFiles.dir("lib")
+AddFiles.multiple("config")
