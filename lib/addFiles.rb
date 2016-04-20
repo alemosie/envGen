@@ -25,7 +25,7 @@ class Files
 
   def write # adds relative path of file to environment
     File.open("config/environment.rb", "a") {|env|
-      env.puts "require '#{self.relativePath(file)}'"
+      env.puts "require_relative '#{self.relativePath(file)}'"
     }
     puts "Added '#{self.fileName}'"
   end
@@ -33,6 +33,17 @@ class Files
   def isRuby?
     File.extname(fileName) == ".rb"
   end
+
+  def self.convertMultiples(input)
+    files = []
+    if input.include?(",")
+      files << input.split(",")
+    else
+      files << input
+    end
+    files
+  end
+
 
   def notRuby # handles non-Ruby files
     puts "'#{fileName}' is not a Ruby (.rb) file. Continue? (Y/N)"
@@ -43,7 +54,7 @@ class Files
   end
 
   def relativePath(file) # finds file path relative to environment
-    dir = Pathname.new Dir.pwd
+    dir = Pathname.new (Dir.pwd + '/config/environment.rb')
     filePathname = Pathname.new File.absolute_path(file)
     relative = (filePathname.relative_path_from dir).to_s
     results = relative.split("/").uniq.join("/")
@@ -52,8 +63,10 @@ end
 
 class AddFiles
 
-  def self.single(file) # handles writing files
-    new_file = Files.createIfNotInConfig(file)
+  def self.single(input) # handles writing files
+    TODO: # files = Files.convertMultiples(input)
+
+    new_input = Files.createIfNotInConfig(file)
     if new_file # if not nil
       if File.file?(new_file.file) # check if file
         if new_file.isRuby?
@@ -107,5 +120,4 @@ class AddFiles
 end
 
 # puts AddFiles.absolutePath('test1.rb')
-
-AddFiles.multiple("config")
+AddFiles.single("lib/test1.rb")

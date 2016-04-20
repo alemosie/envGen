@@ -7,11 +7,6 @@ require 'bundler'
 Bundler.require
 
 
-# DATABASE
-DB = SQLite3::Database.new('DATABASE')
-DB.results_as_hash = true
-
-
 # GEM DEPENDENCIES (require [gem])
 
 
@@ -19,3 +14,4 @@ DB.results_as_hash = true
 
 
 #! ACTION: Dependencies to sort
+require_relative '../lib/test1.rb'
