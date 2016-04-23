@@ -2,12 +2,12 @@ class Init
 
   attr_accessor :config
 
-  def self.print_usage
+  def self.usage
     puts "\nUSAGE:\n  envGen [option]"
   end
 
   def self.help
-    print_usage
+    usage
     puts "\nOPTIONS:"
     puts "  init                : Initialize environment.rb file"
     puts "  file [file], [file] : Add file to environment, e.g. 'lib/test1.rb'"
@@ -52,27 +52,15 @@ class Init
 
   def self.headers
     File.open("config/environment.rb", "w+") {|file|
-      file.puts "# ADD CURRENT DIR TO LOAD PATH"
-      file.puts "$: << '.'"
-      file.puts "\n\n"
-      file.puts "# AUTO INSTALL GEMS VIA BUNDLER"
-      file.puts "require 'bundler'"
-      file.puts "Bundler.require" # require 'bundler/setup', Bundler.require?
-      file.puts "\n\n"
-      file.puts "# GEM DEPENDENCIES (require [gem])"
-      file.puts "\n\n"
-      file.puts "# FILE DEPENDENCIES (require [file])"
-      file.puts "\n\n"
-      file.puts "#! ACTION: Dependencies to sort"
+      file.puts "# AUTO INSTALL GEMS VIA BUNDLER\nrequire 'bundler'\nBundler.require
+      \n\n# GEM DEPENDENCIES (require [gem])
+      \n\n# FILE DEPENDENCIES (require [file])
+      \n\n#! ACTION: Dependencies to sort"
     }
-    puts "\nWriting 'environment.rb' file:"
-    puts "  Added current directory to load path"
-    puts "  Added bundler"
-    puts "  Added database syntax"
-    puts "  Added gem header"
-    puts "  Added file header"
-    puts "  Added to-sort header"
+    puts "\nWriting 'environment.rb' file:
+  Added bundler
+  Added gem header
+  Added file header
+  Added to-sort header"
   end
 end
-
-Init.help

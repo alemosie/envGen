@@ -2,7 +2,7 @@ require 'pathname'
 require 'pry'
 require 'find'
 
-class Files
+class Doc
 
   attr_accessor :file, :fileName
 
@@ -13,7 +13,7 @@ class Files
 
   def self.createIfNotInConfig(file) # creates a files object if not exists
     if !inConfig?(file)
-      Files.new(file)
+      Doc.new(file)
     else
       puts "'#{File.basename(file)}' already added to environment.rb"
     end
@@ -44,12 +44,13 @@ class Files
     files
   end
 
-
   def notRuby # handles non-Ruby files
     puts "'#{fileName}' is not a Ruby (.rb) file. Continue? (Y/N)"
     answer = gets.chomp.strip
     if answer == "Y"
       write
+    else
+      puts "'#{fileName}' not added"
     end
   end
 
@@ -61,21 +62,23 @@ class Files
   end
 end
 
-class AddFiles
+class AddDocs
 
-  def self.single(input) # handles writing files
-    TODO: # files = Files.convertMultiples(input)
-
-    new_input = Files.createIfNotInConfig(file)
-    if new_file # if not nil
-      if File.file?(new_file.file) # check if file
-        if new_file.isRuby?
-          new_file.write
+  def self.single(*input) # handles writing files
+    files = Doc.convertMultiples(input).flatten
+    binding.pry
+    files.each do |doc|
+      new_file = Doc.createIfNotInConfig(doc)
+      if new_file # if not nil
+        if File.file?(new_file.file) # check if file
+          if new_file.isRuby?
+            new_file.write
+          else
+            new_file.notRuby
+          end
         else
-          new_file.notRuby
+          puts "'#{doc}' not found"
         end
-      else
-        "File not found"
       end
     end
   end
@@ -110,14 +113,6 @@ class AddFiles
     end
   end
 
-  def self.dir(dir)
-    File.open("config/environment.rb", "a") {|env|
-      env.puts "Dir['#{dir}/*.rb'].each {|f| require f}"
-    }
-    puts "Added 'Dir['#{dir}/*.rb']'"
-  end
-
 end
 
 # puts AddFiles.absolutePath('test1.rb')
-AddFiles.single("lib/test1.rb")

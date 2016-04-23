@@ -4,24 +4,33 @@ class Gems
 
   @@gems = `gem list --remote`.split("\n")
 
-  def self.exactGem?(gemString, gem)
+  def self.inConfig?(gem) # looks through environment for fileName
+    File.readlines("config/environment.rb").grep(/#{gem}/).size > 0
+  end
+
+  def self.exactGem?(gemString, gem) # takes in a search term and a gem to match against
     gemString.split(" ").first == gem.downcase
   end
 
   def self.gem(gem) # add gem if value is exact match
     gemFound = ""
 
-    @@gems.each do |gemString|
-      if exactGem?(gemString, gem)
-        self.write(gem)
-        puts "Added '#{gem}' to config/environment.rb"
-        gemFound = gem
+    if !self.inConfig?(gem)
+      # binding.pry
+      @@gems.each do |gemString|
+        if exactGem?(gemString, gem)
+          self.write(gem)
+          puts "Added '#{gem}' to config/environment.rb"
+          gemFound = gem
+        end
       end
-    end
 
-    if gemFound == ""
-      puts "No exact match for '#{gem}' found"
-      puts "Search for partial gem name with 'gem -s [gem]'"
+      if gemFound == ""
+        puts "No exact match for '#{gem}' found"
+        puts "Search for partial gem name with 'gem -s [gem]'"
+      end
+    else
+      puts "'#{gem}' already added"
     end
   end
 
@@ -52,5 +61,3 @@ class Gems
     }
   end
 end
-
-Gems.gem("activerecord")

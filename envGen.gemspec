@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "envGen"
   spec.version       = EnvGen::VERSION
   spec.authors       = ["alemosie"]
-  spec.email         = ["alexandra.siega@gmail.com"]
+  spec.email         = ["alexandra.siega@flatironschool.com"]
 
   spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
