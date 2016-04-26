@@ -1,9 +1,7 @@
-require 'pathname'
-require 'pry'
-require 'find'
+require 'pathname' # to generate relative path
+require 'find' # to find ruby files within a directory
 
 class Doc
-
   attr_accessor :file, :fileName
 
   def initialize(file)
@@ -34,7 +32,7 @@ class Doc
     File.extname(fileName) == ".rb"
   end
 
-  def self.convertMultiples(input)
+  def self.convertMultiples(input) # in case someone does commas instead of spaces
     files = []
     if input.include?(",")
       files << input.split(",")
@@ -62,11 +60,9 @@ class Doc
   end
 end
 
-class AddDocs
-
+class AddDoc
   def self.single(*input) # handles writing files
     files = Doc.convertMultiples(input).flatten
-    binding.pry
     files.each do |doc|
       new_file = Doc.createIfNotInConfig(doc)
       if new_file # if not nil
@@ -83,19 +79,8 @@ class AddDocs
     end
   end
 
-  # def self.convert(path)
-  #   if path == "."
-  #     Dir.pwd
-  #   elsif path == ".."
-  #     dir = Dir.pwd.split("/")
-  #     top = dir.pop
-  #     dir.join("/")
-  #   end
-  # end
-
   def self.findRuby(dir) # find all of the Ruby files in the current dir/sub dirs
     rubyFiles = []
-
     Find.find(dir) do |path|
       if File.extname(path) == ".rb" # look for Ruby!
         rubyFiles << path # and compile a list
@@ -112,7 +97,4 @@ class AddDocs
       end
     end
   end
-
 end
-
-# puts AddFiles.absolutePath('test1.rb')

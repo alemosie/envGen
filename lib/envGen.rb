@@ -1,26 +1,43 @@
-# require "envGen/version"
-require 'io/console'
+require_relative "envGen/add_doc.rb"
+require_relative "envGen/init.rb"
+require_relative "envGen/add_gem.rb"
 
 class EnvGen
+  @@options = ["init", "file", "dir", "gem", "help"] # all possible commands
 
-  attr_accessor
-
-  # @@gemlist =  `gem list --remote`.split("\n")
-  # binding.pry
-  @@files = []
-  # @@filePath = File.expand_path $0
-
+  def self.parse # handles user input
+    if !@@options.include?(ARGV[0])
+      puts "invalid command"
+    else
+      case ARGV[0]
+      when "init"
+        Init.init # handle environment creation
+      when "file"
+        ARGV.delete_at(0) # gets rid of "file" to isolate files to add
+        ARGV.each do |arg|
+          AddDoc.single(arg) # adds files individually
+        end
+      when "dir"
+        ARGV.delete_at(0) # gets rid of "file" to isolate files to add
+        ARGV.each do |arg|
+          AddDoc.multiple(arg) # adds Ruby files in specified directory
+        end
+      when "gem"
+        ARGV.delete_at(0) # gets rid of "gem" to isolate gems to add
+        if ARGV[0] == "-s" # kicks off search
+          gem = AddGem.new(ARGV[1])
+          gem.gemSearch
+        else
+          ARGV.each do |arg|
+            gem = AddGem.new(arg) # adds single/multiple gems
+            gem.gem
+          end
+        end
+      when "help"
+        Init.help # displays help message
+      end
+    end
+  end
 end
 
-obj = EnvGen.new
-# EnvGen.file("/Users/asiega/Development/immersive/personal-projects/envGen/lib/envGen.rb")
-# File.expand_path $0 -- computes the absolute path dynamically
-EnvGen.environment
-
-it 'has a version number' do
-  expect(EnvGen::VERSION).not_to be nil
-end
-
-it 'does something useful' do
-  expect(false).to eq(true)
-end
+EnvGen.parse
