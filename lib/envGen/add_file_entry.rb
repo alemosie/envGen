@@ -1,7 +1,7 @@
 require 'pathname' # to generate relative path
 require 'find' # to find ruby files within a directory
 
-class Doc
+class FileEntry
   attr_accessor :file, :fileName
 
   def initialize(file)
@@ -11,7 +11,7 @@ class Doc
 
   def self.createIfNotInConfig(file) # creates a files object if not exists
     if !inConfig?(file)
-      Doc.new(file)
+      FileEntry.new(file)
     else
       puts "'#{File.basename(file)}' already added to environment.rb"
     end
@@ -60,11 +60,11 @@ class Doc
   end
 end
 
-class AddDoc
+class AddFileEntry
   def self.single(*input) # handles writing files
-    files = Doc.convertMultiples(input).flatten
+    files = FileEntry.convertMultiples(input).flatten
     files.each do |doc|
-      new_file = Doc.createIfNotInConfig(doc)
+      new_file = FileEntry.createIfNotInConfig(doc)
       if new_file # if not nil
         if File.file?(new_file.file) # check if file
           if new_file.isRuby?

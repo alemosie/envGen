@@ -40,38 +40,51 @@ describe Init do
   end
 
   describe ".config" do
+
     it "config directory exists" do
-      expect(File).to be_directory("config")
+      expect(Dir).to receive(:exists?).with("#{Dir.pwd}/config").and_return(true)
+      expect { Init.config }.to output(/exists/).to_stdout
+    end
+    it "config directory doesn't exist" do
+      expect(Dir).to receive(:exists?).with("#{Dir.pwd}/config").and_return(false)
+      expect(Dir).to receive(:mkdir).with("config")
+      expect { Init.config }.to output(/Created/).to_stdout
     end
   end
 
   describe ".environment" do
-    it "environment.rb files exists" do
-      expect(File).to exist("config/environment.rb")
+    it "environment file exists" do
+      expect(File).to receive(:exists?).with("#{Dir.pwd}/config/environment.rb").and_return(true)
+      expect { Init.environment }.to output(/exists/).to_stdout
+    end
+    it "environment file doesn't exist" do
+      expect(File).to receive(:exists?).with("#{Dir.pwd}/config/environment.rb").and_return(false)
+      expect(File).to receive(:new).with("#{Dir.pwd}/config/environment.rb", "w+")
+      expect { Init.environment }.to output(/Created/).to_stdout
     end
   end
 
   describe ".headers" do
     it "added bundler" do
-      file = double(Init.headers)
+      file = double
       expect(File).to receive(:open).with("config/environment.rb", "w+").and_yield(file)
       expect(file).to receive(:puts).with(/require 'bundler'\nBundler.require/)
-      expect { Init.headers }.to output(/Added bundler/).to_stdout
+      expect{ Init.headers }.to output(/Added bundler/).to_stdout
     end
     it "added gem header" do
-      file = double(Init.headers)
+      file = double
       expect(File).to receive(:open).with("config/environment.rb", "w+").and_yield(file)
       expect(file).to receive(:puts).with(/GEM DEPENDENCIES/)
       expect { Init.headers }.to output(/Added gem header/).to_stdout
     end
     it "added file header" do
-      file = double(Init.headers)
+      file = double
       expect(File).to receive(:open).with("config/environment.rb", "w+").and_yield(file)
       expect(file).to receive(:puts).with(/FILE DEPENDENCIES/)
       expect { Init.headers }.to output(/Added file header/).to_stdout
     end
     it "added to-sort header" do
-      file = double(Init.headers)
+      file = double
       expect(File).to receive(:open).with("config/environment.rb", "w+").and_yield(file)
       expect(file).to receive(:puts).with(/Dependencies to sort/)
       expect { Init.headers }.to output(/Added file header/).to_stdout
@@ -80,13 +93,15 @@ describe Init do
 
   describe ".init" do
     it "checks for config directory" do
-      expect(File).to be_directory("config")
+      expect(Dir).to receive(:exists?).with("#{Dir.pwd}/config").and_return(true)
+      Init.config
     end
     it "checks for environment file" do
-      expect(File).to exist("config/environment.rb")
+      expect(File).to receive(:exists?).with("#{Dir.pwd}/config/environment.rb").and_return(true)
+      Init.environment
     end
     it "writes environment file template" do
-      file = double(Init.headers)
+      file = double
       expect(File).to receive(:open).with("config/environment.rb", "w+").and_yield(file)
       expect(file).to receive(:puts).with(/AUTO INSTALL/)
       expect { Init.headers }.to output(/Added bundler/).to_stdout

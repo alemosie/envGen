@@ -11,7 +11,7 @@ class Init
     puts "\nOPTIONS:"
     puts "  init                : Initialize environment.rb file"
     puts "  file [file], [file] : Add file to environment, e.g. 'lib/test1.rb'"
-    puts "  dir [dir], [dir]    : Add all .rb files in directory to environment"
+    puts "  dir [dir]           : Add all .rb files in directory to environment"
     puts "  gem [gem], [gem]    : Add gem to environment using exact name"
     puts "  gem -s [gem]        : Search on partial gem name"
     puts "  help                : Display this message \n"

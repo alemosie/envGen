@@ -1,4 +1,4 @@
-require_relative "envGen/add_doc.rb"
+require_relative "envGen/add_file_entry.rb"
 require_relative "envGen/init.rb"
 require_relative "envGen/add_gem.rb"
 
@@ -15,12 +15,12 @@ class EnvGen
       when "file"
         ARGV.delete_at(0) # gets rid of "file" to isolate files to add
         ARGV.each do |arg|
-          AddDoc.single(arg) # adds files individually
+          AddFileEntry.single(arg) # adds files individually
         end
       when "dir"
         ARGV.delete_at(0) # gets rid of "file" to isolate files to add
         ARGV.each do |arg|
-          AddDoc.multiple(arg) # adds Ruby files in specified directory
+          AddFileEntry.multiple(arg) # adds Ruby files in specified directory
         end
       when "gem"
         ARGV.delete_at(0) # gets rid of "gem" to isolate gems to add
@@ -30,7 +30,7 @@ class EnvGen
         else
           ARGV.each do |arg|
             gem = AddGem.new(arg) # adds single/multiple gems
-            gem.gem
+            gem.gemEntry
           end
         end
       when "help"
