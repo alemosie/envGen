@@ -38,13 +38,13 @@ describe AddGem do
   describe "#inConfig?" do
     let(:config_lines) { ["rest-client"] }
 
-    it "returns true if gem in environment.rb" do
+    it "returns @gemName if gem in environment.rb" do
       expect(File).to receive(:readlines).with("config/environment.rb").and_return(config_lines)
-      expect(@restClient.inConfig?).to be true
+      expect(@restClient.inConfig?.count).to eq(1)
     end
-    it "returns false if gem not in environment.rb" do
+    it "returns nothing if gem not in environment.rb" do
       expect(File).to receive(:readlines).with("config/environment.rb").and_return(config_lines)
-      expect(@largestRodent.inConfig?).to be false
+      expect(@largestRodent.inConfig?.count).to eq(0)
     end
   end
 
@@ -62,12 +62,10 @@ describe AddGem do
     let(:gem_string) { "prybaby" }
 
     it "doesn't add gem if already in environment" do
-      expect(File).to receive(:readlines).with("config/environment.rb").and_return(in_config)
       expect { @restClient.gemEntry }.to output(/already added/).to_stdout
     end
 
     it "doesn't add gem if gem doesn't exist" do
-      expect(File).to receive(:readlines).with("config/environment.rb").and_return(in_config)
       expect(@largestRodent.gemName).not_to eq(gem_string)
       expect { @largestRodent.gemEntry }.to output(/No exact match/).to_stdout
     end
@@ -75,7 +73,7 @@ describe AddGem do
     describe "adds gem if exists and not in environment" do
       it "checks if not in environment" do
         expect(File).to receive(:readlines).with("config/environment.rb").and_return(in_config)
-        expect(@prybaby.inConfig?).to be false
+        expect(@prybaby.inConfig?.count).to eq(0)
       end
       it "checks if the gem exists" do
         expect(@prybaby.gemName).to eq(gem_string)

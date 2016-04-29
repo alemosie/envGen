@@ -24,9 +24,9 @@ class FileEntry
 
   def write # adds relative path of file to environment
     File.open("config/environment.rb", "a") {|env|
-      env.puts "require_relative '#{self.relativePath(file)}'"
+      env.puts "require_relative '#{relativePath}'"
     }
-    puts "Added '#{self.fileName}'"
+    puts "Added '#{fileName}'"
   end
 
   def isRuby?
@@ -43,17 +43,7 @@ class FileEntry
     end
   end
 
-  def self.convertMultiples(input) # in case someone does commas instead of spaces
-    files = []
-    if input.include?(",")
-      files << input.split(",")
-    else
-      files << input
-    end
-    files
-  end
-
-  def relativePath(file) # finds file path relative to environment
+  def relativePath # finds file path relative to environment
     dir = Pathname.new (Dir.pwd + '/config/environment.rb')
     filePathname = Pathname.new File.absolute_path(file)
     relative = (filePathname.relative_path_from dir).to_s
@@ -62,9 +52,10 @@ class FileEntry
 end
 
 class AddFileEntry
+
   def self.single(*input) # handles writing files
-    files = FileEntry.convertMultiples(input).flatten
-    files.each do |doc|
+    input.each do |inp|
+      doc = "#{Dir.pwd}/#{inp}"
       new_file = FileEntry.createIfNotInConfig(doc)
       if new_file # if not nil
         if File.file?(new_file.file) # check if file
@@ -83,7 +74,7 @@ class AddFileEntry
   def self.findRuby(dir) # find all of the Ruby files in the current dir/sub dirs
     rubyFiles = []
     Find.find(dir) do |path|
-      if File.extname(path) == ".rb" # look for Ruby!
+      if File.extname(path) == ".rb"
         rubyFiles << path # and compile a list
       end
     end

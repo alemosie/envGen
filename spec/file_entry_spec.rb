@@ -74,12 +74,20 @@ describe FileEntry do
   end
 
   describe "#notRuby" do
-    context "adds file to environment with user permission" do
-      # it "receives user input 'Y' to continue" do
-      #   expect(self).to receive(:gets).and_return("Y")
-      #   expect(@invalidFileObject.notRuby).to eq("Y")
-      # end
+    it "adds file to environment with user permission" do
+      allow(@validFileObject).to receive(:gets) { "Y" } # the new version of "stub"
+      expect(@validFileObject.notRuby).to eq(@validFileObject.write)
+    end
+    it "doesn't add file in any other case" do
+      allow(@validFileObject).to receive(:gets) { "N" }
+      expect(@validFileObject.notRuby).to eq(puts "'#{@validFileObject.fileName}' not added")
     end
   end
 
+  describe "#relativePath" do
+    let(:path) { "../lib/#{@fileName}" }
+    it "creates relative path from config/environment.rb for FileEntry object" do
+      expect(@validFileObject.relativePath).to eq(path)
+    end
+  end
 end
