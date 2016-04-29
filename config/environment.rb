@@ -11,4 +11,4 @@ Bundler.require
 
 #! ACTION: Dependencies to sort
 require_relative '../notReal.rb'
-require_relative '../notReal.rb'
+gem 'rest-client'

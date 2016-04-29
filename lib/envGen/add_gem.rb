@@ -1,19 +1,25 @@
+require 'pry'
+
 class AddGem
-  attr_accessor :gemName
+  attr_accessor :gemName, :gemsFound
 
   @@gems = `gem list --remote`.split("\n") # gets updated list of all current RubyGems gems
 
   def initialize(input) # input is gem name, called with @gemName
     @gemName = input
-    @gemFound = ""
+    @gemsFound = []
   end
 
   def inConfig? # looks through environment for gem
-    File.readlines("config/environment.rb").grep(/#{@gemName}/).size > 0
+    File.readlines("config/environment.rb").grep(/#{gemName}/)
   end
 
   def exactGem?(gemString) # takes in a search term and a gem to match against
-    gemString.split(" ").first == @gemName.downcase
+    gemString.split(" ").first == gemName.downcase
+  end
+
+  def gemExists?
+    @@gems.select {|gem| gem.split(" ").first == gemName }.count > 0
   end
 
   def write
@@ -22,15 +28,9 @@ class AddGem
     }
   end
 
-  def findExactGem(gemNameInput)
-    @gemFound = @@gems.select { |gemString| gemString.split(" ").first == gemNameInput}
-  end
-
-  def writeExactGem(gemString)
-    if exactGem?(gemString)
-      self.write
-      puts "Added '#{gemName}' to config/environment.rb"
-    end
+  def writeExactGem
+    write
+    puts "Added '#{gemName}' to config/environment.rb"
   end
 
   def noExactGem
@@ -39,36 +39,30 @@ class AddGem
   end
 
   def gemEntry # handles gem entry
-    gemFound = ""
-    if !self.inConfig?
-      @@gems.each do |gemString| # add gem if exists
-        if exactGem?(gemString)
-          self.write
-          puts "Added '#{@gemName}' to config/environment.rb"
-          gemFound = @gemName
-        end
-      end
-      if gemFound == "" # add gem if doesn't exist
-        puts "No exact match for '#{@gemName}' found"
-        puts "Search for partial gem name with 'gem -s [gem]'"
-      end
+    if !inConfig? && gemExists?
+      writeExactGem
+    elsif inConfig? && gemExists? # add gem if doesn't exist
+      puts "'#{gemName}' already added"
     else
-      puts "'#{@gemName}' already added"
+      noExactGem
     end
   end
 
-  def gemSearch # partial name search
+  def findPartialNames # partial name search
     puts "Searching through #{@@gems.count} gems..."
-    gemsFound = []
     @@gems.each do |gemString| # searching through gems + version numbers
       if exactGem?(gemString)
         gemsFound.unshift("** #{gemString}") # highlights exact match
-      elsif gemString.include?(@gemName.downcase)
+      elsif gemString.include?(gemName.downcase)
         gemsFound << gemString
       end
     end
-    if gemsFound == []
-      puts "No exact match for '#{@gemName.downcase}' found"
+  end
+
+  def gemSearch
+    findPartialNames
+    if gemsFound.count == 0
+      puts "No exact match for '#{gemName.downcase}' found"
     else
       puts "\nFound #{gemsFound.count} gems:"
       gemsFound.each {|gem| puts gem}
