@@ -1,5 +1,6 @@
 require 'pathname' # to generate relative path
 require 'find' # to find ruby files within a directory
+require 'pry'
 
 class FileEntry
   attr_accessor :file, :fileName
@@ -17,7 +18,7 @@ class FileEntry
     end
   end
 
-  def self.inConfig?(file) # looks through environment for fileName
+  def self.inConfig?(file) # looks through environment for fileName; doesn't create an object/instance method because it may not be necessary
     File.readlines("config/environment.rb").grep(/#{File.basename(file)}/).size > 0
   end
 
@@ -32,16 +33,6 @@ class FileEntry
     File.extname(fileName) == ".rb"
   end
 
-  def self.convertMultiples(input) # in case someone does commas instead of spaces
-    files = []
-    if input.include?(",")
-      files << input.split(",")
-    else
-      files << input
-    end
-    files
-  end
-
   def notRuby # handles non-Ruby files
     puts "'#{fileName}' is not a Ruby (.rb) file. Continue? (Y/N)"
     answer = gets.chomp.strip
@@ -50,6 +41,16 @@ class FileEntry
     else
       puts "'#{fileName}' not added"
     end
+  end
+
+  def self.convertMultiples(input) # in case someone does commas instead of spaces
+    files = []
+    if input.include?(",")
+      files << input.split(",")
+    else
+      files << input
+    end
+    files
   end
 
   def relativePath(file) # finds file path relative to environment

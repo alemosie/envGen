@@ -5,6 +5,7 @@ class AddGem
 
   def initialize(input) # input is gem name, called with @gemName
     @gemName = input
+    @gemFound = ""
   end
 
   def inConfig? # looks through environment for gem
@@ -17,21 +18,37 @@ class AddGem
 
   def write
     File.open("config/environment.rb", "a+") {|env|
-      env.puts "gem '#{@gemName}'"
+      env.puts "gem '#{gemName}'"
     }
   end
 
-  def gemEntry # add gem if value is exact match
+  def findExactGem(gemNameInput)
+    @gemFound = @@gems.select { |gemString| gemString.split(" ").first == gemNameInput}
+  end
+
+  def writeExactGem(gemString)
+    if exactGem?(gemString)
+      self.write
+      puts "Added '#{gemName}' to config/environment.rb"
+    end
+  end
+
+  def noExactGem
+    puts "No exact match for '#{gemName}' found"
+    puts "Search for partial gem name with 'gem -s [gem]'"
+  end
+
+  def gemEntry # handles gem entry
     gemFound = ""
     if !self.inConfig?
-      @@gems.each do |gemString|
+      @@gems.each do |gemString| # add gem if exists
         if exactGem?(gemString)
           self.write
           puts "Added '#{@gemName}' to config/environment.rb"
           gemFound = @gemName
         end
       end
-      if gemFound == ""
+      if gemFound == "" # add gem if doesn't exist
         puts "No exact match for '#{@gemName}' found"
         puts "Search for partial gem name with 'gem -s [gem]'"
       end

@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'pry'
 
 RSpec.configure do |c|
   c.before { allow($stdout).to receive(:puts) }
@@ -13,6 +12,10 @@ describe AddGem do
   describe "#initialize" do
     it "takes in one argument, a gem name" do
       expect { AddGem.new("rest-client") }.not_to raise_error
+    end
+    it "creates @gemName from input" do
+      name = "rest-client"
+      expect(@restClient.gemName).to eq(name)
     end
   end
 
@@ -88,10 +91,11 @@ describe AddGem do
 
   describe "#gemSearch" do
     let(:exact_match) { "rest-client" }
-    let(:partial_match) { "rest-client v2" }
+    let(:partial_match) { "adamwiggins-rest-client" }
 
     it "finds gems that partially match object's @gemName" do
       expect(partial_match).to include(@restClient.gemName)
+      expect { @restClient.gemSearch }.to output(/#{Regexp.quote(partial_match)}/).to_stdout
     end
     it "highlights exact matches with @gemName" do
       expect(@restClient.gemName).to eq(exact_match)
