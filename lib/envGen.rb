@@ -7,7 +7,7 @@ class EnvGen
 
   def self.file
     ARGV.delete_at(0) # gets rid of "file" to isolate files to add
-    AddFile.multiple(arg) # adds files individually
+    AddFile.multiple(ARGV) # adds files individually
   end
 
   def self.dir

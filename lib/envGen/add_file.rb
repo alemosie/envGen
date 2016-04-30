@@ -71,8 +71,8 @@ class AddFile
   end
 
   def self.multiple(*input) # handles writing files
-    input.each do |f|
-      single
+    input.flatten.each do |f|
+      single(f)
     end
   end
 

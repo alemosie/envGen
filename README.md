@@ -1,8 +1,6 @@
 # envGen
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/envGen`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+EnvGen is a basic gem that write file and gem dependencies to your environment file.
 
 ## Installation
 
@@ -22,7 +20,16 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+USAGE:
+envGen [option]
+
+OPTIONS:
+init                : Initialize environment.rb file
+file [file], [file] : Add file to environment, e.g. 'lib/test1.rb'
+dir [dir]           : Add all .rb files in directory to environment. e.g. 'lib'
+gem [gem], [gem]    : Add gem to environment using exact name
+gem -s [gem]        : Search on partial gem name
+help                : Display this message
 
 ## Development
 
