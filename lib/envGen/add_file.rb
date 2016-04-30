@@ -1,9 +1,8 @@
-require 'pathname'
+require 'pathname' # to generate relative path
+require 'find' # to find ruby files within a directory
 require 'pry'
-require 'find'
 
-class Files
-
+class PrepareFile
   attr_accessor :file, :fileName
 
   def initialize(file)
@@ -13,21 +12,21 @@ class Files
 
   def self.createIfNotInConfig(file) # creates a files object if not exists
     if !inConfig?(file)
-      Files.new(file)
+      PrepareFile.new(file)
     else
-      puts "'#{File.basename(file)}' already added to environment.rb"
+      puts "'#{File.basename(file)}' already added"
     end
   end
 
-  def self.inConfig?(file) # looks through environment for fileName
-    File.readlines("config/environment.rb").grep(/#{File.basename(file)}/).size > 0
+  def self.inConfig?(file) # looks through environment for fileName; doesn't create an object/instance method because it may not be necessary
+    File.readlines("config/environment.rb").grep(/#{File.basename(file)}/).count > 0
   end
 
   def write # adds relative path of file to environment
     File.open("config/environment.rb", "a") {|env|
-      env.puts "require '#{self.relativePath(file)}'"
+      env.puts "require_relative '#{relativePath}'"
     }
-    puts "Added '#{self.fileName}'"
+    puts "Added '#{fileName}'"
   end
 
   def isRuby?
@@ -39,73 +38,61 @@ class Files
     answer = gets.chomp.strip
     if answer == "Y"
       write
+    else
+      puts "'#{fileName}' not added"
     end
   end
 
-  def relativePath(file) # finds file path relative to environment
-    dir = Pathname.new Dir.pwd
+  def relativePath # finds file path relative to environment
+    dir = Pathname.new (Dir.pwd + '/config/environment.rb')
     filePathname = Pathname.new File.absolute_path(file)
     relative = (filePathname.relative_path_from dir).to_s
     results = relative.split("/").uniq.join("/")
   end
 end
 
-class AddFiles
+class AddFile
 
-  def self.single(file) # handles writing files
-    new_file = Files.createIfNotInConfig(file)
+  def self.single(input) # handles writing files
+    # binding.pry
+    new_file = PrepareFile.createIfNotInConfig(input)
     if new_file # if not nil
-      if File.file?(new_file.file) # check if file
+      # binding.pry
+      if File.file?(new_file.file) # check if file with full path of new_file
         if new_file.isRuby?
           new_file.write
         else
           new_file.notRuby
         end
       else
-        "File not found"
+        puts "'#{new_file.fileName}' not found"
       end
     end
   end
 
-  # def self.convert(path)
-  #   if path == "."
-  #     Dir.pwd
-  #   elsif path == ".."
-  #     dir = Dir.pwd.split("/")
-  #     top = dir.pop
-  #     dir.join("/")
-  #   end
-  # end
+  def self.multiple(*input) # handles writing files
+    input.flatten.each do |f|
+      single(f)
+    end
+  end
 
   def self.findRuby(dir) # find all of the Ruby files in the current dir/sub dirs
     rubyFiles = []
-
     Find.find(dir) do |path|
-      if File.extname(path) == ".rb" # look for Ruby!
+      if File.extname(path) == ".rb"
         rubyFiles << path # and compile a list
       end
     end
     rubyFiles
   end
 
-  def self.multiple(dir) # takes in dir name, adds all Ruby files in dir
+  def self.dir(dir) # takes in dir name, adds all Ruby files in dir
     files = self.findRuby(dir)
+    # binding.pry
     files.each do |file|
       if file.include?(".rb") && File.file?(file)
         self.single(file)
       end
     end
   end
-
-  def self.dir(dir)
-    File.open("config/environment.rb", "a") {|env|
-      env.puts "Dir['#{dir}/*.rb'].each {|f| require f}"
-    }
-    puts "Added 'Dir['#{dir}/*.rb']'"
-  end
-
 end
-
-# puts AddFiles.absolutePath('test1.rb')
-
-AddFiles.multiple("config")
