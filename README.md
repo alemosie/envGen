@@ -1,5 +1,4 @@
 # envGen
->>>>>>> working
 
 EnvGen is a basic gem that write file and gem dependencies to your environment file.
 
