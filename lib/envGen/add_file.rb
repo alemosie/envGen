@@ -2,7 +2,7 @@ require 'pathname' # to generate relative path
 require 'find' # to find ruby files within a directory
 require 'pry'
 
-class FileEntry
+class PrepareFile
   attr_accessor :file, :fileName
 
   def initialize(file)
@@ -12,14 +12,14 @@ class FileEntry
 
   def self.createIfNotInConfig(file) # creates a files object if not exists
     if !inConfig?(file)
-      FileEntry.new(file)
+      PrepareFile.new(file)
     else
-      puts "'#{File.basename(file)}' already added to environment.rb"
+      puts "'#{File.basename(file)}' already added"
     end
   end
 
   def self.inConfig?(file) # looks through environment for fileName; doesn't create an object/instance method because it may not be necessary
-    File.readlines("config/environment.rb").grep(/#{File.basename(file)}/).size > 0
+    File.readlines("config/environment.rb").grep(/#{File.basename(file)}/).count > 0
   end
 
   def write # adds relative path of file to environment
@@ -51,23 +51,28 @@ class FileEntry
   end
 end
 
-class AddFileEntry
+class AddFile
 
-  def self.single(*input) # handles writing files
-    input.each do |inp|
-      doc = "#{Dir.pwd}/#{inp}"
-      new_file = FileEntry.createIfNotInConfig(doc)
-      if new_file # if not nil
-        if File.file?(new_file.file) # check if file
-          if new_file.isRuby?
-            new_file.write
-          else
-            new_file.notRuby
-          end
+  def self.single(input) # handles writing files
+    # binding.pry
+    new_file = PrepareFile.createIfNotInConfig(input)
+    if new_file # if not nil
+      # binding.pry
+      if File.file?(new_file.file) # check if file with full path of new_file
+        if new_file.isRuby?
+          new_file.write
         else
-          puts "'#{doc}' not found"
+          new_file.notRuby
         end
+      else
+        puts "'#{new_file.fileName}' not found"
       end
+    end
+  end
+
+  def self.multiple(*input) # handles writing files
+    input.each do |f|
+      single
     end
   end
 
@@ -81,8 +86,9 @@ class AddFileEntry
     rubyFiles
   end
 
-  def self.multiple(dir) # takes in dir name, adds all Ruby files in dir
+  def self.dir(dir) # takes in dir name, adds all Ruby files in dir
     files = self.findRuby(dir)
+    # binding.pry
     files.each do |file|
       if file.include?(".rb") && File.file?(file)
         self.single(file)
