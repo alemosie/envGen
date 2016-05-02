@@ -44,10 +44,9 @@ class PrepareFile
   end
 
   def relativePath # finds file path relative to environment
-    dir = Pathname.new (Dir.pwd + '/config/environment.rb')
+    dir = Pathname.new (Dir.pwd + "/config")
     filePathname = Pathname.new File.absolute_path(file)
     relative = (filePathname.relative_path_from dir).to_s
-    # binding.pry
   end
 end
 
