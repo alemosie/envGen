@@ -43,7 +43,6 @@ class AddGem
   end
 
   def gemEntry # handles gem entry
-    # binding.pry
     if !inConfig? && gemExists?
       writeExactGem
     elsif inConfig? && gemExists? # add gem if doesn't exist

@@ -47,7 +47,7 @@ class PrepareFile
     dir = Pathname.new (Dir.pwd + '/config/environment.rb')
     filePathname = Pathname.new File.absolute_path(file)
     relative = (filePathname.relative_path_from dir).to_s
-    results = relative.split("/").uniq.join("/")
+    # binding.pry
   end
 end
 
@@ -96,3 +96,6 @@ class AddFile
     end
   end
 end
+
+f = PrepareFile.new("/Users/asiega/Development/immersive/personal-projects/envGen/lib/envGen.rb")
+f.relativePath

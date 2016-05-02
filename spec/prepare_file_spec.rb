@@ -32,7 +32,6 @@ describe PrepareFile do
       expect(PrepareFile.inConfig?(@file)).to be true
     end
     it "returns false if file not in environment.rb" do
-      # binding.pry
       expect(PrepareFile.inConfig?(@invalidFile)).to be false
     end
   end
@@ -68,7 +67,7 @@ describe PrepareFile do
   end
 
   describe "#isRuby?" do
-    it "returns only files with a .rb extension" do
+    it "returns true for files with a .rb extension" do
       expect(@validFileObject.isRuby?).to be true
     end
   end
@@ -86,7 +85,7 @@ describe PrepareFile do
   end
 
   describe "#relativePath" do
-    let(:path) { "../lib/#{@fileName}" }
+    let(:path) { "../../lib/#{@fileName}" }
     it "creates relative path from config/environment.rb for PrepareFile object" do
       expect(@validFileObject.relativePath).to eq(path)
     end
