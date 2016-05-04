@@ -1,6 +1,6 @@
 require_relative "envGen/add_file.rb"
-require_relative "envGen/init.rb"
 require_relative "envGen/add_gem.rb"
+require_relative "envGen/init.rb"
 
 class EnvGen
   @@options = ["init", "file", "dir", "gem", "help"] # all possible commands
@@ -11,7 +11,7 @@ class EnvGen
   end
 
   def self.dir
-    ARGV.delete_at(0) # gets rid of "dir" to isolate files to add
+    ARGV.delete_at(0) # gets rid of "dir" to isolate dir to add
     AddFile.dir(ARGV.first) # adds Ruby files in specified directory
   end
 
@@ -19,22 +19,22 @@ class EnvGen
     ARGV.delete_at(0) # gets rid of "gem" to isolate gems to add
     if ARGV[0] == "-s" # kicks off search
       new_gem = AddGem.new(ARGV[1])
-      new_gem.gemSearch
+      new_gem.gemSearch # searches for gem specified
     else
       ARGV.each do |arg|
-        new_gem = AddGem.new(arg) # adds single/multiple gems
+        new_gem = AddGem.new(arg) # creates objects for each gem
         new_gem.gemEntry
       end
     end
   end
 
-  def self.parse # handles user input
-    if !@@options.include?(ARGV[0])
+  def self.parse(input) # handles user input from executable, ARGV[0]
+    if !@@options.include?(input)
       puts "invalid command"
     else
-      case ARGV[0]
+      case input
       when "init"
-        Init.init # handle environment creation
+        Init.init # handles environment creation
       when "file"
         file
       when "dir"
@@ -47,5 +47,3 @@ class EnvGen
     end
   end
 end
-
-EnvGen.parse

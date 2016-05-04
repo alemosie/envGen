@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require_relative "../lib/envGen.rb"
+
+EnvGen.parse(ARGV[0])
