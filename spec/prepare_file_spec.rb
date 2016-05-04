@@ -85,7 +85,7 @@ describe PrepareFile do
   end
 
   describe "#relativePath" do
-    let(:path) { "../../lib/#{@fileName}" }
+    let(:path) { "../lib/#{@fileName}" }
     it "creates relative path from config/environment.rb for PrepareFile object" do
       expect(@validFileObject.relativePath).to eq(path)
     end
