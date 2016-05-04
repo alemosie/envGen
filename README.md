@@ -1,6 +1,6 @@
 # envGen
 
-EnvGen is a basic gem that writes file and gem dependencies to your environment file.
+EnvGen is a basic gem that helps you write file and gem dependencies to your environment file from your terminal.
 
 ## Installation
 
@@ -28,15 +28,15 @@ envGen [option]
 
 OPTIONS:
 
-init                : Initialize environment.rb file
+init                : Initialize config directory and environment.rb file
 
-file [file], [file] : Add file to environment, e.g. 'lib/test1.rb'
+file [file], [file] : Add file(s) to environment, e.g. 'lib/test1.rb'
 
 dir [dir]           : Add all .rb files in directory to environment. e.g. 'lib'
 
-gem [gem], [gem]    : Add gem to environment using exact name
+gem [gem], [gem]    : Add gem(s) to environment, if exact gem name (e.g. "rest-client") is used
 
-gem -s [gem]        : Search on partial gem name
+gem -s [gem]        : Search on partial gem name (e.g. "rest" for "rest-client") through all public gems to find exact name
 
 help                : Display this message
 
